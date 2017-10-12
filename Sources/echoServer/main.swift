@@ -25,6 +25,15 @@ func listen(to socket: Socket) {
             print("Socket Signature: \(newSocket.signature?.description)")
 
             try newSocket.write(from: "Hello there!!!")
+
+            while true {
+                let res = try newSocket.readString()
+                print("res: \(res)")
+
+                if let str = res {
+                   try newSocket.write(from: "-> " + str)
+                }
+            }
         } catch let error {
             print("error: \(error)")
         }
