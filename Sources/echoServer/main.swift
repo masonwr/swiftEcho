@@ -1,45 +1,59 @@
 import Foundation
 import Socket
 
+var prompt = "--> "
 
-let port = 1234
-print("Hello, world!")
-
-func main() {
-    do {
-        let socket = try Socket.create()
-        try socket.listen(on: port)
-        listen(to: socket)
-    } catch let error {
-        print("error: \(error)")
-    }
+func main(port: Int) {
+  do {
+    let socket = try Socket.create()
+    try socket.listen(on: port)
+    listen(to: socket)
+  } catch let error {
+    print("error: \(error)")
+  }
 }
 
 func listen(to socket: Socket) {
-    print("listening on port: \(port)")
-
-    while true {
-
-        do {
-            let newSocket = try socket.acceptClientConnection()
-            print("Socket Signature: \(newSocket.signature?.description)")
-
-            try newSocket.write(from: "Hello there!!!")
-
-            while true {
-                let res = try newSocket.readString()
-                print("res: \(res)")
-
-                if let str = res {
-                   try newSocket.write(from: "-> " + str)
-                }
-            }
-        } catch let error {
-            print("error: \(error)")
-        }
-
+  print("to connect: telnet localhost \(port)")
+  
+  while true {
+    guard let newSocket = try? socket.acceptClientConnection() else {
+      print("Could not accept new connection")
+      return
     }
+    
+    do {
+      try newSocket.write(from: "-- init connection --\n\r" + prompt)
+    } catch let error {
+      print("error: \(error)")
+    }
+    
+    
+    while true {
+      guard let res = try? newSocket.readString(), let str = res else {
+        print("(!) count not get responce")
+        continue
+      }
+      
+      let trimmed = str.trimmingCharacters(in: .whitespacesAndNewlines)
+      
+      if trimmed.lowercased() == "exit" {
+        let _ = try? newSocket.write(from: "Goodbuy...\n")
+        break
+      }
+      
+      print("res -> \(trimmed)")
+      
+      do {
+        try newSocket.write(from: trimmed + "\n" + prompt)
+      } catch let error {
+        print("error: \(error)")
+      }
+    }
+  }
 }
 
 
-main()
+let port = 1234
+main(port: port)
+
