@@ -14,6 +14,7 @@ func main(port: Int) {
 }
 
 func listen(to socket: Socket) {
+  
   print("to connect: telnet localhost \(port)")
   
   while true {
@@ -21,6 +22,10 @@ func listen(to socket: Socket) {
       print("Could not accept new connection")
       return
     }
+    
+    print("Accepted connection from: \(newSocket.remoteHostname):\(newSocket.remotePort)")
+    //print("Socket Signature: \(String(describing: newSocket.signature?.description))")
+
     
     do {
       try newSocket.write(from: "-- init connection --\n\r" + prompt)
@@ -39,6 +44,8 @@ func listen(to socket: Socket) {
       
       if trimmed.lowercased() == "exit" {
         let _ = try? newSocket.write(from: "Goodbuy...\n")
+        newSocket.close()
+        socket.close()
         break
       }
       
