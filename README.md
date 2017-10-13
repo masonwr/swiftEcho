@@ -1,3 +1,4 @@
 # echoServer
 
-A description of this package.
+Basic Echo server written in swift. 
+Using IBM BlueSocket. 
